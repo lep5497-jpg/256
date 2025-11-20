@@ -1,101 +1,108 @@
 // script.js
-// Theme toggle, PDF download (html2pdf), and contact form validation.
+document.addEventListener('DOMContentLoaded', () => {
+  // Elements
+  const themeToggle = document.getElementById('themeToggle');
+  const body = document.body;
+  const downloadBtn = document.getElementById('downloadPdf');
+  const yearSpan = document.getElementById('year');
+  const contactForm = document.getElementById('contactForm');
+  const formError = document.getElementById('formError');
 
-// --- Theme Toggle ---
-const themeToggleBtn = document.getElementById('theme-toggle');
-const htmlEl = document.documentElement;
+  // Set year
+  if (yearSpan) yearSpan.textContent = new Date().getFullYear();
 
-function updateThemeUI() {
-  const theme = htmlEl.getAttribute('data-theme') || 'light';
-  themeToggleBtn.setAttribute('aria-pressed', theme === 'dark');
-  themeToggleBtn.textContent = theme === 'dark' ? '☀️' : '🌙';
-}
-
-themeToggleBtn.addEventListener('click', () => {
-  const current = htmlEl.getAttribute('data-theme') === 'dark' ? 'dark' : 'light';
-  const next = current === 'dark' ? 'light' : 'dark';
-  htmlEl.setAttribute('data-theme', next);
-  updateThemeUI();
-
-  // Optional: persist preference
-  try { localStorage.setItem('preferred-theme', next); } catch(e) {}
-});
-
-// Apply saved preference (if present)
-try {
-  const saved = localStorage.getItem('preferred-theme');
-  if (saved) htmlEl.setAttribute('data-theme', saved);
-} catch(e) {}
-updateThemeUI();
-
-
-// --- Download PDF using html2pdf.js ---
-const downloadBtn = document.getElementById('download-pdf');
-downloadBtn.addEventListener('click', () => {
-  // Optional button disabled state while generating
-  downloadBtn.disabled = true;
-  downloadBtn.textContent = 'Preparing...';
-
-  // html2pdf configuration
-  const opt = {
-    margin:       10,
-    filename:     'resume.pdf',
-    image:        { type: 'jpeg', quality: 0.98 },
-    html2canvas:  { scale: 2, useCORS: true },
-    jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' }
-  };
-
-  // choose an element to render — using the whole body here
-  const element = document.body;
-
-  // Trigger generation
-  html2pdf().set(opt).from(element).save().then(() => {
-    downloadBtn.disabled = false;
-    downloadBtn.textContent = 'Download PDF';
-  }).catch((err) => {
-    console.error('PDF generation failed:', err);
-    alert('Unable to generate PDF in this browser.');
-    downloadBtn.disabled = false;
-    downloadBtn.textContent = 'Download PDF';
-  });
-});
-
-
-// --- Contact Form Validation ---
-const form = document.getElementById('contact-form');
-const errorBox = document.getElementById('form-error');
-
-function validateEmail(email) {
-  // simple, robust-ish email regex
-  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
-}
-
-form.addEventListener('submit', (e) => {
-  e.preventDefault();
-  errorBox.hidden = true;
-  errorBox.textContent = '';
-
-  const name = form.name.value.trim();
-  const email = form.email.value.trim();
-  const message = form.message.value.trim();
-
-  const errors = [];
-  if (!name) errors.push('Name cannot be empty.');
-  if (!email || !validateEmail(email)) errors.push('Please enter a valid email address.');
-  if (message.length < 10) errors.push('Message must be at least 10 characters long.');
-
-  if (errors.length) {
-    errorBox.innerHTML = errors.map(x => `<div>• ${x}</div>`).join('');
-    errorBox.hidden = false;
-    // focus first invalid field
-    if (!name) form.name.focus();
-    else if (!email || !validateEmail(email)) form.email.focus();
-    else form.message.focus();
-    return;
+  // --- Theme toggle (dark / light) ---
+  function setTheme(theme) {
+    body.setAttribute('data-theme', theme);
+    themeToggle.setAttribute('aria-pressed', theme === 'dark' ? 'true' : 'false');
+    themeToggle.textContent = theme === 'dark' ? '☀️' : '🌙';
+    // optional: persist
+    try { localStorage.setItem('site-theme', theme); } catch(e){}
   }
 
-  // Simulate successful send:
-  alert('Message sent successfully!');
-  form.reset();
-  errorBox.hidden = true;
+  // Initialize from localStorage or prefers-color-scheme
+  const savedTheme = (function(){
+    try { return localStorage.getItem('site-theme'); } catch(e){ return null; }
+  })();
+
+  if (savedTheme) {
+    setTheme(savedTheme);
+  } else {
+    const prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+    setTheme(prefersDark ? 'dark' : 'light');
+  }
+
+  themeToggle.addEventListener('click', () => {
+    const current = body.getAttribute('data-theme') === 'dark' ? 'dark' : 'light';
+    setTheme(current === 'dark' ? 'light' : 'dark');
+  });
+
+  // --- Download PDF using html2pdf ---
+  // Requires html2pdf.bundle.min.js included in index.html
+  downloadBtn.addEventListener('click', async () => {
+    const element = document.getElementById('pageContent');
+    if (!element) return;
+
+    // Optional: show a quick visual feedback
+    downloadBtn.textContent = 'Preparing…';
+
+    // html2pdf options
+    const opt = {
+      margin:       0.4,
+      filename:     'resume.pdf',
+      image:        { type: 'jpeg', quality: 0.98 },
+      html2canvas:  { scale: 2, logging: false, useCORS: true },
+      jsPDF:        { unit: 'in', format: 'letter', orientation: 'portrait' }
+    };
+
+    try {
+      // Wait a tiny bit to allow paint if theme just changed
+      await html2pdf().set(opt).from(element).save();
+    } catch (err) {
+      console.error('PDF generation failed', err);
+      alert('Unable to generate PDF. Please try again.');
+    } finally {
+      // restore text
+      downloadBtn.textContent = 'Download PDF';
+    }
+  });
+
+  // --- Contact form validation ---
+  function validateEmail(email) {
+    // simple but effective regex for general validation
+    return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(String(email).toLowerCase());
+  }
+
+  contactForm.addEventListener('submit', (e) => {
+    e.preventDefault();
+    formError.style.display = 'none';
+    formError.textContent = '';
+
+    const name = document.getElementById('name').value.trim();
+    const email = document.getElementById('email').value.trim();
+    const message = document.getElementById('message').value.trim();
+
+    const errors = [];
+    if (!name) errors.push('Please enter your name.');
+    if (!validateEmail(email)) errors.push('Please enter a valid email address.');
+    if (message.length < 10) errors.push('Message must be at least 10 characters.');
+
+    if (errors.length) {
+      formError.innerHTML = errors.map(e => `<div>• ${e}</div>`).join('');
+      formError.style.display = 'block';
+      // focus first invalid
+      if (!name) document.getElementById('name').focus();
+      else if (!validateEmail(email)) document.getElementById('email').focus();
+      else document.getElementById('message').focus();
+      return;
+    }
+
+    // If validation passes
+    alert('Message sent successfully!');
+
+    // clear form
+    contactForm.reset();
+    formError.style.display = 'none';
+  });
+
 });
