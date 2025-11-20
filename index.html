@@ -1,0 +1,171 @@
+<!doctype html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Resume — Web Development Student</title>
+
+  <!-- Link to stylesheet -->
+  <link rel="stylesheet" href="styles.css" />
+
+  <!-- html2pdf.js (CDN) — required for "Download PDF" button -->
+  <!-- Include this script before your script.js so script.js can call html2pdf -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.9.3/html2pdf.bundle.min.js"></script>
+</head>
+<body>
+  <header class="site-header">
+    <div class="header-left">
+      <h1 class="name">Alex Developer</h1>
+      <p class="tagline">Front-End Web Developer · Building accessible, responsive interfaces</p>
+    </div>
+
+    <div class="header-actions">
+      <button id="theme-toggle" class="btn" aria-pressed="false" title="Toggle dark / light">
+        🌙
+        <span class="sr-only">Toggle theme</span>
+      </button>
+      <button id="download-pdf" class="btn primary">Download PDF</button>
+    </div>
+  </header>
+
+  <main class="container">
+    <!-- About + Skills column -->
+    <section class="panel about-skills">
+      <section id="about" class="card about">
+        <div class="about-inner">
+          <img src="https://via.placeholder.com/160" alt="Profile photo" class="profile-pic" />
+          <div class="about-text">
+            <h2>About Me</h2>
+            <p>
+              I am a web development student with hands-on experience in HTML, CSS, JavaScript, and React.
+              I built a functional to-do list app to practice component-driven design and state management.
+              I enjoy learning new technologies and applying them to real projects, and I play video games in my free time.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <section id="skills" class="card skills">
+        <h2>Skills</h2>
+        <!-- Skills list with percent -->
+        <ul class="skills-list">
+          <li>
+            <span class="skill-name">HTML</span>
+            <span class="skill-percent">95%</span>
+            <div class="progress"><div style="width:95%"></div></div>
+          </li>
+          <li>
+            <span class="skill-name">CSS</span>
+            <span class="skill-percent">90%</span>
+            <div class="progress"><div style="width:90%"></div></div>
+          </li>
+          <li>
+            <span class="skill-name">JavaScript</span>
+            <span class="skill-percent">85%</span>
+            <div class="progress"><div style="width:85%"></div></div>
+          </li>
+          <li>
+            <span class="skill-name">React</span>
+            <span class="skill-percent">80%</span>
+            <div class="progress"><div style="width:80%"></div></div>
+          </li>
+          <li>
+            <span class="skill-name">Git</span>
+            <span class="skill-percent">75%</span>
+            <div class="progress"><div style="width:75%"></div></div>
+          </li>
+        </ul>
+      </section>
+    </section>
+
+    <!-- Experience + Projects column -->
+    <section class="panel exp-projects">
+      <section id="experience" class="card experience">
+        <h2>Experience</h2>
+
+        <ul class="job-list">
+          <li class="job">
+            <div class="job-head">
+              <h3>Web Development Intern</h3>
+              <span class="job-dates">Jun 2024 — Aug 2024</span>
+            </div>
+            <div class="job-sub">Acme Web Studios — Remote</div>
+            <p>Worked on front-end tasks, implemented responsive layouts and assisted with accessibility testing.</p>
+          </li>
+
+          <li class="job">
+            <div class="job-head">
+              <h3>Frontend Volunteer</h3>
+              <span class="job-dates">Sep 2023 — May 2024</span>
+            </div>
+            <div class="job-sub">Campus Tech Club — Local</div>
+            <p>Built landing pages and improved performance for small club projects using vanilla JS and CSS.</p>
+          </li>
+        </ul>
+      </section>
+
+      <section id="projects" class="card projects">
+        <h2>Projects</h2>
+
+        <div class="projects-grid">
+          <article class="project-card">
+            <h3>To-Do List App</h3>
+            <p class="project-desc">
+              A to-do list app built with React and Firebase for authentication and realtime storage. Features include task CRUD, sorting, and user authentication with persistent state across devices.
+            </p>
+            <p class="tech">React · Firebase · CSS Modules</p>
+          </article>
+
+          <article class="project-card">
+            <h3>Personal Blog</h3>
+            <p class="project-desc">
+              A responsive personal blog using semantic HTML, custom CSS, and lightweight JavaScript for client-side interactions. Built to showcase writing and portfolio pieces with a simple CMS-like structure.
+            </p>
+            <p class="tech">HTML · CSS · JavaScript</p>
+          </article>
+
+          <article class="project-card">
+            <h3>Weather App</h3>
+            <p class="project-desc">
+              A weather app that consumes a public API to display current conditions and a 5-day forecast. Includes location search, units toggle, and graceful error handling.
+            </p>
+            <p class="tech">JavaScript · Fetch API · CSS</p>
+          </article>
+        </div>
+      </section>
+    </section>
+  </main>
+
+  <footer class="contact-section card" id="contact">
+    <h2>Contact</h2>
+    <form id="contact-form" novalidate>
+      <div class="form-row">
+        <label for="name">Name</label>
+        <input id="name" name="name" type="text" required />
+      </div>
+
+      <div class="form-row">
+        <label for="email">Email</label>
+        <input id="email" name="email" type="email" required />
+      </div>
+
+      <div class="form-row">
+        <label for="message">Message</label>
+        <textarea id="message" name="message" rows="4" required></textarea>
+      </div>
+
+      <div id="form-error" role="alert" class="form-error" aria-live="polite" hidden></div>
+
+      <div class="form-actions">
+        <button type="submit" class="btn primary">Send Message</button>
+        <button type="reset" class="btn">Reset</button>
+      </div>
+    </form>
+
+    <p class="small muted">Or email me at <a href="mailto:alex@example.com">alex@example.com</a></p>
+  </footer>
+
+  <!-- Your script (theme toggle, form validation, pdf download) -->
+  <script src="script.js"></script>
+</body>
+</html>
